@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS employeeDB;
 CREATE database employeeDB;
 
 USE employeeDB;
@@ -24,3 +25,4 @@ CREATE TABLE employee (
     manager_id INTEGER NULL,
     PRIMARY KEY (id)
 );
+

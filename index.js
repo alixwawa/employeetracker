@@ -3,97 +3,229 @@ var mysql = require("mysql");
 var inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
-  host: "localhost",
+    host: "localhost",
 
-  port: 3306,
+    port: 3306,
 
-  user: "root",
+    user: "root",
 
-  password: "",
-  database: "employeedb"
+    password: "",
+    database: "employeedb"
 });
 
-connection.connect(function(err) {
+connection.connect(err => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    trackEmployee();
-  });
+    start();
+});
 
-  trackEmployee = () => {
+start = () => {
     //   console.log("works");
     inquirer
-    .prompt({
-      name: "action",
-      type: "rawlist",
-      message: "What would you like to do?",
-      choices: [
-        "Add departments",
-        "Add roles",
-        "Add employees",
-        "View departments",
-        "View roles",
-        "View employees",
-        "Update employee roles",
-        "Update employee managers",
-        "View employees by manager",
-        "Delete departments",
-        "Delete roles",
-        "Delete employees",
-        "View the total utilized budget of a department"        
-      ]
-    }).then(function(answer) {
-        switch (answer.action) {
-        case "Add departments":
-          addDepartments();
-          break;
-  
-        case "Add roles":
-          addRoles();
-          break;
-  
-        case "Add employees":
-          addEmployees();
-          break;
-  
-        case "View departments":
-          viewDepartments();
-          break;
-  
-        case "View roles":
-          viewRoles();
-          break;
+        .prompt({
+            name: "action",
+            type: "rawlist",
+            message: "What would you like to do?",
+            choices: [
+                "Add departments",
+                "Add roles",
+                "Add employees",
+                "View departments",
+                "View roles",
+                "View employees",
+                "Update employee roles",
+                "Update employee managers",
+                "View employees by manager",
+                "Delete departments",
+                "Delete roles",
+                "Delete employees",
+                "View the total utilized budget of a department"
+            ]
+        }).then(answer => {
+            switch (answer.action) {
+                case "Add departments":
+                    addDepartments();
+                    break;
 
-        case "View employees":
-          viewEmployees();
-          break;
-  
-        case "Update employee roles":
-          updateRoles();
-          break;
-  
-        case "Update employee managers":
-          updateManagers();
-          break;
-  
-        case "View employees by manager":
-          viewEmployeesByManager();
-          break;
-  
-        case "Delete departments":
-          deleteDepartments();
-          break;
+                case "Add roles":
+                    addRoles();
+                    break;
 
-        case "Delete roles":
-          deleteRoles();
-          break;
-  
-        case "Delete employees":
-          deleteEmployees();
-          break;
-  
-        case "View the total utilized budget of a department":
-          viewBudgetByDepartment();
-          break;
-        }
-      });
-  };
+                case "Add employees":
+                    addEmployees();
+                    break;
+
+                case "View departments":
+                    viewDepartments();
+                    break;
+
+                case "View roles":
+                    viewRoles();
+                    break;
+
+                case "View employees":
+                    viewEmployees();
+                    break;
+
+                case "Update employee roles":
+                    updateRoles();
+                    break;
+
+                case "Update employee managers":
+                    updateManagers();
+                    break;
+
+                case "View employees by manager":
+                    viewEmployeesByManager();
+                    break;
+
+                case "Delete departments":
+                    deleteDepartments();
+                    break;
+
+                case "Delete roles":
+                    deleteRoles();
+                    break;
+
+                case "Delete employees":
+                    deleteEmployees();
+                    break;
+
+                case "View the total utilized budget of a department":
+                    viewBudgetByDepartment();
+                    break;
+            }
+        });
+};
+
+addDepartments = () => {
+    inquirer
+        .prompt({
+            name: "department",
+            type: "input",
+            message: "What department would you like to add?"
+        }).then(answer => {
+            connection.query("INSERT INTO department SET ?",
+                {
+                    name: answer.department,
+                },
+                err => {
+                    if (err) throw err;
+                    console.log("Your department was created successfully!");
+                    start();
+                }
+            );
+        });
+}
+
+addRoles = () => {
+    // prompt for info about the item being put up for auction
+    inquirer
+        .prompt([
+            {
+                name: "title",
+                type: "input",
+                message: "What is the title of the role you would like to submit?"
+            },
+            {
+                name: "salary",
+                type: "input",
+                message: "What is the salary of this role?",
+                validate: value => {
+                    if (isNaN(value) === false) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                name: "department_id",
+                type: "input",
+                message: "What department are they in? Sales=1, I.T.=2, Finance=3, Legal=4",
+                validate: value => {
+                    if (isNaN(value) === false) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        ])
+        .then(answer => {
+            // when finished prompting, insert a new item into the db with that info
+            connection.query(
+                "INSERT INTO role SET ?",
+                {
+                    title: answer.title,
+                    salary: answer.salary || 0,
+                    department_id: answer.department_id || 0,
+                    
+                },
+                err => {
+                    if (err) throw err;
+                    console.log("Your role was created successfully!");
+                    // re-prompt the user for if they want to bid or post
+                    start();
+                }
+            );
+        });
+
+};
+
+addEmployees = () => {
+    // prompt for info about the item being put up for auction
+    inquirer
+        .prompt([
+            {
+                name: "first_name",
+                type: "input",
+                message: "What is the first name?"
+            },
+            {
+                name: "last_name",
+                type: "input",
+                message: "What is the last name?",
+                
+            },
+            {
+                name: "role_id",
+                type: "input",
+                message: "What department are they in? Sales=1, I.T.=2, Finance=3, Legal=4",
+                validate: value => {
+                    if (isNaN(value) === false) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                name: "manager_id",
+                type: "input",
+                message: "What department are they in? Sales=1, I.T.=2, Finance=3, Legal=4",
+                validate: value => {
+                    if (isNaN(value) === false) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        ])
+        .then(answer => {
+            // when finished prompting, insert a new item into the db with that info
+            connection.query(
+                "INSERT INTO role SET ?",
+                {
+                    title: answer.title,
+                    salary: answer.salary || 0,
+                    department_id: answer.department_id || 0,
+                    
+                },
+                err => {
+                    if (err) throw err;
+                    console.log("Your role was created successfully!");
+                    // re-prompt the user for if they want to bid or post
+                    start();
+                }
+            );
+        });
+
+};

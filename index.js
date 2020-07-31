@@ -31,16 +31,14 @@ start = () => {
                 "Add departments",
                 "Add roles",
                 "Add employees",
-                "View departments",
-                "View roles",
-                "View employees",
+                "View departments, roles, and employees",
                 "Update employee roles",
-                "Update employee managers",
-                "View employees by manager",
-                "Delete departments",
-                "Delete roles",
-                "Delete employees",
-                "View the total utilized budget of a department"
+                // "Update employee managers",
+                // "View employees by manager",
+                // "Delete departments",
+                // "Delete roles",
+                // "Delete employees",
+                // "View the total utilized budget of a department"
             ]
         }).then(answer => {
             switch (answer.action) {
@@ -56,45 +54,37 @@ start = () => {
                     addEmployees();
                     break;
 
-                case "View departments":
-                    viewDepartments();
-                    break;
-
-                case "View roles":
-                    viewRoles();
-                    break;
-
-                case "View employees":
-                    viewEmployees();
+                case "View departments, roles, and employees":
+                    view();
                     break;
 
                 case "Update employee roles":
                     updateRoles();
                     break;
 
-                case "Update employee managers":
-                    updateManagers();
-                    break;
+                // case "Update employee managers":
+                //     updateManagers();
+                //     break;
 
-                case "View employees by manager":
-                    viewEmployeesByManager();
-                    break;
+                // case "View employees by manager":
+                //     viewEmployeesByManager();
+                //     break;
 
-                case "Delete departments":
-                    deleteDepartments();
-                    break;
+                // case "Delete departments":
+                //     deleteDepartments();
+                //     break;
 
-                case "Delete roles":
-                    deleteRoles();
-                    break;
+                // case "Delete roles":
+                //     deleteRoles();
+                //     break;
 
-                case "Delete employees":
-                    deleteEmployees();
-                    break;
+                // case "Delete employees":
+                //     deleteEmployees();
+                //     break;
 
-                case "View the total utilized budget of a department":
-                    viewBudgetByDepartment();
-                    break;
+                // case "View the total utilized budget of a department":
+                //     viewBudgetByDepartment();
+                //     break;
             }
         });
 };
@@ -159,7 +149,7 @@ addRoles = () => {
                     title: answer.title,
                     salary: answer.salary || 0,
                     department_id: answer.department_id || 0,
-                    
+
                 },
                 err => {
                     if (err) throw err;
@@ -185,7 +175,7 @@ addEmployees = () => {
                 name: "last_name",
                 type: "input",
                 message: "What is the last name?",
-                
+
             },
             {
                 name: "role_id",
@@ -218,7 +208,7 @@ addEmployees = () => {
                     first_name: answer.first_name,
                     last_name: answer.last_name,
                     role_id: answer.role_id || 0,
-                    manager_id:answer.manager_id || 0,
+                    manager_id: answer.manager_id || 0,
                 },
                 err => {
                     if (err) throw err;
@@ -231,35 +221,98 @@ addEmployees = () => {
 
 };
 
-viewDepartments = () => {
+view = () => {
     inquirer
-      .prompt({
-        name: "action",
-        type: "rawlist",
-        message: "Would you like to view?",
-        choices: [
-          "View departments",
-          "View roles",
-          "View employees",
-        ]
-      }).then(answer => {
-        switch (answer.action) {
-            case "View departments":
-                
-                console.table("hi1");
-                break;
+        .prompt({
+            name: "action",
+            type: "rawlist",
+            message: "Would you like to view?",
+            choices: [
+                "View departments",
+                "View roles",
+                "View employees",
+            ]
+        }).then(answer => {
+            switch (answer.action) {
+                case "View departments":
+                    var query = "SELECT * FROM department";
+                    connection.query(query, function (err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        start();
+                    });
+                    break;
 
-            case "View roles":
-                console.table("hi2");
-                break;
+                case "View roles":
+                    var query = "SELECT * FROM role";
+                    connection.query(query, function (err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        start();
+                    });
+                    break;
 
-            case "View employees":
-                console.table("hi3");
-                break;
+                case "View employees":
+                    var query = "SELECT * FROM employee";
+                    connection.query(query, function (err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        start();
+                    });
+                    break;
 
-         
 
-           
-        }
-    });
+
+
+            };
+
+        });
 };
+
+updateRoles = () => {
+    connection.query("SELECT * FROM employee", function (err, results) {
+        if (err) throw err;
+        // once you have the items, prompt the user for which they'd like to bid on
+        inquirer
+            .prompt([
+                {
+                    name: "choice",
+                    type: "rawlist",
+                    message: "Whose role would you like to change?",
+                    choices: function () {
+                        var choiceArray = [];
+                        for (var i = 0; i < results.length; i++) {
+                            choiceArray.push(results[i].last_name);
+                        }
+                        return choiceArray;
+                    },
+
+                },
+                {
+                    name: "rolechange",
+                    type: "input",
+                    message: "What role ID would you like to give them?"
+                }
+            ])
+            .then(function (answer) {
+
+                connection.query(
+                    "UPDATE auctions SET ? WHERE ?",
+                    [
+                        {   
+                            last_name: answer.choice
+                            
+                        },
+                        {
+                            role_id: answer.rolechange
+                        }
+                    ],
+                    function (error) {
+                        if (error) throw err;
+                        console.log("Role changed successfully!");
+                        start();
+                    }
+                );
+            })
+    })
+}

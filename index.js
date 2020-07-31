@@ -16,6 +16,7 @@ var connection = mysql.createConnection({
 connection.connect(err => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
+    console.table();
     start();
 });
 
@@ -189,7 +190,7 @@ addEmployees = () => {
             {
                 name: "role_id",
                 type: "input",
-                message: "What department are they in? Sales=1, I.T.=2, Finance=3, Legal=4",
+                message: "What is the employee's role id",
                 validate: value => {
                     if (isNaN(value) === false) {
                         return true;
@@ -200,7 +201,7 @@ addEmployees = () => {
             {
                 name: "manager_id",
                 type: "input",
-                message: "What department are they in? Sales=1, I.T.=2, Finance=3, Legal=4",
+                message: "What is the employee's manager ID",
                 validate: value => {
                     if (isNaN(value) === false) {
                         return true;
@@ -212,20 +213,53 @@ addEmployees = () => {
         .then(answer => {
             // when finished prompting, insert a new item into the db with that info
             connection.query(
-                "INSERT INTO role SET ?",
+                "INSERT INTO employee SET ?",
                 {
-                    title: answer.title,
-                    salary: answer.salary || 0,
-                    department_id: answer.department_id || 0,
-                    
+                    first_name: answer.first_name,
+                    last_name: answer.last_name,
+                    role_id: answer.role_id || 0,
+                    manager_id:answer.manager_id || 0,
                 },
                 err => {
                     if (err) throw err;
-                    console.log("Your role was created successfully!");
+                    console.log("Your employee was created successfully!");
                     // re-prompt the user for if they want to bid or post
                     start();
                 }
             );
         });
 
+};
+
+viewDepartments = () => {
+    inquirer
+      .prompt({
+        name: "action",
+        type: "rawlist",
+        message: "Would you like to view?",
+        choices: [
+          "View departments",
+          "View roles",
+          "View employees",
+        ]
+      }).then(answer => {
+        switch (answer.action) {
+            case "View departments":
+                
+                console.table("hi1");
+                break;
+
+            case "View roles":
+                console.table("hi2");
+                break;
+
+            case "View employees":
+                console.table("hi3");
+                break;
+
+         
+
+           
+        }
+    });
 };

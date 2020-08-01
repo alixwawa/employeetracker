@@ -280,39 +280,29 @@ updateRoles = () => {
                     type: "rawlist",
                     message: "Whose role would you like to change?",
                     choices: function () {
-                        var choiceArray = [];
+                        var employeeChoice = [];
                         for (var i = 0; i < results.length; i++) {
-                            choiceArray.push(results[i].last_name);
+                            employeeChoice.push(results[i].last_name);
                         }
-                        return choiceArray;
+                        return employeeChoice;
                     },
 
                 },
-                {
-                    name: "rolechange",
-                    type: "input",
-                    message: "What role ID would you like to give them?"
-                }
+
             ])
             .then(function (answer) {
-
-                connection.query(
-                    "UPDATE auctions SET ? WHERE ?",
-                    [
-                        {   
-                            last_name: answer.choice
-                            
-                        },
+                inquirer
+                    .prompt([
                         {
-                            role_id: answer.rolechange
-                        }
-                    ],
-                    function (error) {
-                        if (error) throw err;
-                        console.log("Role changed successfully!");
+                            name: "roleID",
+                            type: "input",
+                            message: "What is the role ID number"
+                        },
+                    ]).then(function (answerTwo) {
+                        connection.query("UPDATE employee SET role_id = ? WHERE last_name = ?", [answerTwo.roleID, answer.choice]);
+                        console.log("Role Update Was a Success!");
                         start();
-                    }
-                );
+                    })
             })
     })
 }

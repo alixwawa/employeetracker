@@ -8,6 +8,7 @@ Developers are often tasked with creating interfaces that make it easy for non-d
 
 
 - [Click Here For Video Link](https://drive.google.com/file/d/1C4l3_UBrLdsrwCubU_5gwEsvttALegI5/view)
+* after pulling up video, click on settings gear to change video quality to 720p*
 
 ![Photo1](photos/employeetrackerpic1.png)
 ![Photo2](photos/employeetrackerpic2.png)
